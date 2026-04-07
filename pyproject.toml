@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Template for Django projects"
 authors = ["Rogerio Campos <rogerio.campos07@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "django_project_template" }]
+packages = [{include = "core"}]
 
 [tool.poetry.dependencies]
 python = ">=3.13,<4.0"

@@ -1,37 +1,33 @@
 FROM python:3.14-slim
 
-# 2. Variáveis de ambiente cruciais para o Linux e Docker
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_CACHE_DIR='/tmp/poetry_cache'
+    POETRY_NO_INTERACTION=1
 
-# 3. Define a Arena de trabalho
 WORKDIR /app
 
-# 4. Instala dependências de sistema para o Postgres no Linux
-RUN apt-get update && apt-get install -y \
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     gcc \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 5. Instala o Poetry na versão mais recente para suportar o [project]
-RUN pip install poetry
+# Instalar Poetry
+RUN pip install --no-cache-dir poetry
 
-# 6. Copia os arquivos de configuração (Raiz do projeto para a Raiz do container)
+# Copiar arquivos de configuração Poetry
 COPY pyproject.toml poetry.lock* /app/
 
-# 7. Instala as dependências (Django 5.2, Pydantic, Psycopg2)
-# Como você usa a seção [project], o Poetry instala as 'dependencies' automaticamente
-RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
+# Instalar dependências do projeto (sem virtualenv, diretamente no Python global)
+RUN poetry install --no-root
 
-# 8. Copia o restante do código (as pastas core, estudos, etc.)
+# Copiar código fonte
 COPY . /app/
 
-# 9. Abre o portão do estádio
+# Expor porta
 EXPOSE 8000
 
-# 10. Apita o início do jogo!
+# Comando padrão
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
